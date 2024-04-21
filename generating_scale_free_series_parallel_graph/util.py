@@ -1,9 +1,11 @@
+import pickle
 import networkx as nx
 import matplotlib.pyplot as plt
 import random
 
 SEED = 43
 DEBUG_MODE = False
+random.seed(SEED)
 
 
 def debug(*args):
@@ -12,7 +14,14 @@ def debug(*args):
         print(*args, flush=True)
 
 
-random.seed(SEED)
+try:
+    with open("p_k_dict.pickle", "rb") as f:
+        p_k_cache = pickle.load(f)
+except:
+    p_k_cache = None
+
+
+
 
 
 class Graph:
@@ -91,6 +100,8 @@ class Graph:
 
 
 def calculate_p_k(k: int, gamma: float = 2.47):
+    if p_k_cache is not None and k in p_k_cache:
+        return p_k_cache[k]
     zeta_of_gamma = sum([i ** (-gamma) for i in range(2, 1000000)])
     p_k = k ** (-gamma) / zeta_of_gamma
     return p_k
