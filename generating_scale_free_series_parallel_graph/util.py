@@ -14,15 +14,6 @@ def debug(*args):
         print(*args, flush=True)
 
 
-try:
-    with open("p_k_dict.pickle", "rb") as f:
-        p_k_cache = pickle.load(f)
-except:
-    p_k_cache = None
-
-
-
-
 
 class Graph:
     def __init__(self) -> None:
@@ -60,6 +51,12 @@ class Graph:
             nx.draw_networkx_edges(G, pos, edgelist=[edge], edge_color=f"C{i}", ax=ax)
 
         plt.show()
+
+    def get_clustering_coefficient(self):
+        G = nx.Graph()
+        G.add_nodes_from(self.nodes)
+        G.add_edges_from(self.edges)
+        return nx.average_clustering(G)
 
     def print_stats(self):
         G = nx.Graph()
@@ -100,8 +97,6 @@ class Graph:
 
 
 def calculate_p_k(k: int, gamma: float = 2.47):
-    if p_k_cache is not None and k in p_k_cache:
-        return p_k_cache[k]
     zeta_of_gamma = sum([i ** (-gamma) for i in range(2, 1000000)])
     p_k = k ** (-gamma) / zeta_of_gamma
     return p_k
@@ -126,11 +121,11 @@ def generate_node_degree_pair_list(num_nodes, gamma: float = 2.47):
     return node_degree_pair_list
 
 
-def generate_scale_free_series_parallel_graph(N: int) -> Graph:
+def generate_scale_free_series_parallel_graph(N: int, gamma : float) -> Graph:
     graph = Graph()
 
     # generate a degree sequence of size N using gamma
-    node_degree_pair_list = generate_node_degree_pair_list(N, gamma=2.47)
+    node_degree_pair_list = generate_node_degree_pair_list(N, gamma)
 
     debug(f"{node_degree_pair_list=}")
 
